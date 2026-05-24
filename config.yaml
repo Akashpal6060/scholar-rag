@@ -1,0 +1,45 @@
+# ScholarRAG configuration. Edit this rather than hard-coding values in src/.
+
+arxiv:
+  categories: [cs.CV, cs.LG, cs.CL]   # which arXiv categories to ingest
+  max_results_per_run: 500            # cap per fetch (be polite to the API)
+  ingest_full_text: false             # false = abstracts only (start here);
+                                      # true  = download + parse full PDFs (v2)
+
+chunking:
+  strategy: section                   # section | recursive | fixed
+  chunk_size_tokens: 512              # sweep 256 / 512 / 1024 in eval
+  chunk_overlap_tokens: 64
+  add_contextual_prefix: true         # prepend "[Title] [Section]" to each chunk
+
+embedding:
+  model_name: BAAI/bge-m3
+  use_dense: true
+  use_sparse: true                    # BGE-M3 gives both -> native hybrid
+  batch_size: 32
+  max_length: 8192
+
+vector_store:
+  collection_name: arxiv_papers
+  dense_dim: 1024                     # BGE-M3 dense dimension
+
+retrieval:
+  top_k_retrieve: 50                  # broad first pass
+  dense_weight: 0.6                   # fusion weights for hybrid
+  sparse_weight: 0.4
+
+rerank:
+  enabled: true
+  model_name: BAAI/bge-reranker-v2-m3
+  top_k_final: 8                      # chunks passed to the LLM
+
+generation:
+  provider: groq
+  model_name: llama-3.3-70b-versatile
+  temperature: 0.1                    # low -> stay faithful to context
+  max_tokens: 1024
+  refuse_if_no_context: true          # guardrail against hallucination
+
+eval:
+  golden_set_path: data/golden/golden_qa.jsonl
+  recall_k_values: [1, 3, 5, 10]

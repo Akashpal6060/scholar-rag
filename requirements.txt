@@ -1,0 +1,11 @@
+# Lightweight deps for the HF Spaces demo (query lane only — NO indexing).
+# Note: the demo does NOT install torch/FlagEmbedding for the big BGE-M3;
+# at query time we embed with a small CPU model. See note in README.
+FlagEmbedding==1.2.10
+transformers==4.44.2
+torch
+qdrant-client==1.12.1
+groq==0.13.0
+gradio==5.9.1
+pyyaml==6.0.2
+python-dotenv==1.0.1
